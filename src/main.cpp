@@ -159,6 +159,7 @@ void setup() {
   LEDBlink(100, 3);
   sht20.begin();
   DHT_lastMillis=millis();
+  TCCR1B = TCCR1B & B11111000 | B00000010; // for PWM frequency of 3921.16 Hz
   for(byte i=0; i<noOfCannels; i++)
    setPWM(i);
   //A_lum=loadState(A_ID);
