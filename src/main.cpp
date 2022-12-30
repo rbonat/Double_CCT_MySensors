@@ -2,6 +2,7 @@
 #include "uFire_SHT20.h"
 #include "PinChangeInterrupt.h"
 
+
 //Encoders and LED hardware pins
 #define noOfCannels 2
 const byte SW [noOfCannels] = {4, A0};
@@ -15,8 +16,8 @@ volatile int deg [noOfCannels]= {0, 0};
 volatile unsigned long push [noOfCannels] {0, 0};
 volatile unsigned long release[noOfCannels] = {0,0};
 // encoder timmings
-#define longPressTime 1500
-#define dooubleClickTreshold 400
+#define longPressTime 1500*8
+#define dooubleClickTreshold 400*8
 //dimmer LED control variables
 int lum[noOfCannels]= {50, 50};
 int temp[noOfCannels]= {75, 75};
@@ -33,7 +34,7 @@ const byte brightnessCurve[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 14, 17, 21, 2
 
 //DHT specific
 #define TEMPSENSOROFFSET 1.3       //(*0.1)=temperature sensor offset to calibrate specific sensor
-#define DHT_UPDATE_INTERVAL 300   // (seconds) time interval to force temp/hum. message
+#define DHT_UPDATE_INTERVAL 300*8   // (seconds) time interval to force temp/hum. message
 unsigned long DHT_lastMillis = 0;
 uFire_SHT20 sht20;
 
@@ -63,7 +64,6 @@ MyMessage msgLigthtTempState[noOfCannels];
 MyMessage msgLigthtTemp[noOfCannels];
 MyMessage msgHum(DHT_HUM_ID, V_HUM);
 MyMessage msgTemp(DHT_TEMP_ID, V_TEMP);
-
 
 
 //encoder interrupts routines
@@ -159,7 +159,11 @@ void setup() {
   LEDBlink(100, 3);
   sht20.begin();
   DHT_lastMillis=millis();
-  TCCR1B = TCCR1B & B11111000 | B00000010; // for PWM frequency of 3921.16 Hz
+//  TCCR1B = TCCR1B & B11111000 | B00000010; // for PWM frequency of 3921.16 Hz
+TCCR0B = 0b00000010; // x8
+TCCR0A = 0b00000001; // phase correct
+TCCR1A = 0b00000001; // 8bit
+TCCR1B = 0b00000010; // x8 phase correct
   for(byte i=0; i<noOfCannels; i++)
    setPWM(i);
   //A_lum=loadState(A_ID);
